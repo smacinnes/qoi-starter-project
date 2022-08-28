@@ -2,12 +2,12 @@
 
 This project is intended to be used as a starting point for writing a decoder for the QOI image format.
 
-While you should be able to build this project on all major platforms (Windows, MacOS, and common Linux distributions), it is recommended to do so in a UNIX-y environment.
-In a subsequent lab, we're going to be building on the project, adding some tools that work best in Linux or MacOS.
-
-If you are using a Windows device, I've found WSL2 works pretty well.
-I have tested this project on an Ubuntu WSL2 instance.
-Even the GUI image viewer works!
+> ⚠️ While you should be able to build this project on all major platforms (Windows, MacOS, and common Linux distributions), it is recommended to do so in a UNIX-y environment.
+> In a subsequent lab, we're going to be building on the project, adding some tools that work best in Linux or MacOS.
+> 
+> If you are using a Windows device, I've found WSL2 works pretty well.
+> I have tested this project on an Ubuntu WSL2 instance.
+> Even the GUI image viewer works!
 
 ## Getting Started
 
