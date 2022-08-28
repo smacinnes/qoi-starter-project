@@ -54,6 +54,8 @@ git pull upstream main
 
 Your local repository should now be populated with the contents of the template, and you should see commits from yours truly when you run `git log`.
 
+Fetch the git submodules with `git submodule update --init`.
+
 #### Branches
 
 Regardless of which approach you took, you should create a branch for your work.
@@ -66,14 +68,20 @@ git checkout -b assignment-1
 
 ### Setup
 
+Now that you have the source code on your local machine, we can start to setup the project.
+There are a few tools that you'll need.
+Check the platform-specific instructions for tips on installing them.
+
 What you'll need:
 - CMake v3.23+
 - Clang v14+
 - Visual Studio Code
 
-The setup instructions depend on your platform.
+#### Linux (Ubuntu or Debian)
 
-### Linux (Ubuntu or Debian)
+> ℹ️ Debian-based distributions, such as Ubuntu, are the most common, so I've provided instructions for them.
+> You're welcome to use something else, but you may be on your own when it comes to troubleshooting.
+> If you get this working on another distribution, feel free to share any tips with the class via our discussion board.
 
 Get started by installing these packages:
 
@@ -89,8 +97,7 @@ $ sudo apt-get install \
     zip
 ```
 
-
-#### 1. Install CMake
+##### 1. Install CMake
 
 If you are using Ubuntu or Debian, you will likely not have the latest CMake available through apt's default repositories.
 Rather than installing it with apt, you can use install script provided on CMake's download page [here](https://cmake.org/download/).
@@ -103,6 +110,7 @@ $ ./cmake-3.23.2-linux-x86_64.sh --prefix=$HOME/.local --exclude-subdir --skip-l
 ```
 
 Make sure `$HOME/.local/bin` is prepended to your `$PATH`.
+It's common to manage your path in your shell's dotfile in your `$HOME` directory (e.g. `$HOME/.bashrc` for bash or `$HOME/.zshrc` for zsh).
 Once CMake is installed and made available on your `PATH`, verify the version:
 
 ```
@@ -112,8 +120,12 @@ cmake version 3.23.2
 ```
 
 Alternatively, you can use Python's `pip` (or even better `pipx`) to install CMake.
-This is my preference, but your mileage may vary.
-#### 2. Install Clang (and LLVM tools)
+This is my preferred method, but your mileage may vary.
+Here are some links that may prove helpful if you decide to try this approach:
+- [pipx installation](https://github.com/pypa/pipx/#install-pipx)
+- [cmake pypi package](https://pypi.org/project/cmake/)
+
+##### 2. Install Clang (and LLVM tools)
 
 Next, we'll install the latest stable version of Clang. The LLVM project provides [up-to-date packages for Debian and Ubuntu](https://apt.llvm.org/).
 
@@ -134,7 +146,7 @@ Thread model: posix
 InstalledDir: /usr/bin
 ```
 
-#### 3. Setup VS Code
+##### 3. Setup VS Code
 
 Install the C/C++ Extension pack for VS Code (it should be recommended to you when you open the project for the first time).
 You may need to restart/reload VS Code for this to take effect.
@@ -142,9 +154,9 @@ You may need to restart/reload VS Code for this to take effect.
 Run `> CMake: Scan for Kits` so that VS Code finds the version of Clang that you installed in step 2.
 
 Run `> CMake: Select Kit` and select the version of Clang that you installed in step 2.
-### MacOS
+#### MacOS
 
-Use Homebrew to install the dependencies.
+Use [Homebrew](https://brew.sh/) to install the dependencies.
 
 ```
 $ brew install cmake llvm
@@ -157,9 +169,42 @@ $ cd /path/to/qoi
 $ code .
 ```
 
-Select the Homebrew Clang kit.
+Select the Homebrew Clang kit (provided in `.vscode/cmake-kits.json`).
 
-### Windows
+#### Windows
+
+Before setting up this project on Windows, please see my note at the top of this README.
+If you decide to use WSL2 rather than using Windows natively, you can follow the Linux instructions from within your WSL2 environment.
+
+With that disclaimer out of the way, here's how you can get started on Windows natively.
+
+##### 1. Install Visual Studio 2022
+
+You have two options here.
+You can either install the full Visual Studio 2022 (Community edition) if you want the Visual Studio IDE.
+Alternatively, you can just install the build tools.
+For this course, all you need are the build tools, but you may want the full Visual Studio IDE for other courses or projects.
+- [Visual Studio 2022 - Community](https://visualstudio.microsoft.com/downloads/#visual-studio-community-2022)
+- [Visual Studio 2022 - Build Tools](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
+
+Make sure to select "Desktop Development with C++" when choosing what to install.
+
+##### 2. Install CMake
+
+Download and install the "Windows x64 Installer" from the Latest Release section [here](https://cmake.org/download/).
+
+##### 3. Configure VS Code
+
+Open the project folder in VS Code and install the recommended extensions.
+You might need to restart VS Code after installing the extensions.
+
+Open the Command Palette with `Ctrl + Shift + P` and run "CMake: Scan for kits".
+
+From the Command Palette, run "CMake: Select kit". Select "Visual Studio 2022 - x64".
+
+### Building
+
+
 
 ## References
 
