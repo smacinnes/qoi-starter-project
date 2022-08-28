@@ -6,7 +6,7 @@ This project is intended to be used as a starting point for writing a decoder fo
 > In a subsequent lab, we're going to be building on the project, adding some tools that work best in Linux or MacOS.
 > 
 > If you are using a Windows device, I've found WSL2 works pretty well.
-> I have tested this project on an Ubuntu WSL2 instance.
+> I have tested this project on an Ubuntu WSL2 instance from Windows 11.
 > Even the GUI image viewer works!
 
 ## Getting Started
@@ -14,6 +14,8 @@ This project is intended to be used as a starting point for writing a decoder fo
 ### Pre-Setup
 
 #### Option A: GitHub
+
+![Screenshot showing "Use this template" button in GitHub](img/qoi-template.png)
 
 If you are a GitHub user and want to host your source code there, you can get started quickly by clicking "Use this template" on the repository's [home page](https://github.com/eced4406/qoi-starter-project).
 This will prompt you to create a new private repository under your own account (similar to a fork).
