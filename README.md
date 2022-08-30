@@ -48,8 +48,8 @@ $ git init
 
 Now you can configure a remote connection to the template repository and pull its history into yours.
 ```
-git remote add upstream https://github.com/eced4406/qoi-starter-project.git
-git pull upstream main
+$ git remote add upstream https://github.com/eced4406/qoi-starter-project.git
+$ git pull upstream main
 ```
 
 Your local repository should now be populated with the contents of the template, and you should see commits from yours truly when you run `git log`.
@@ -63,7 +63,7 @@ This will make it easier to submit your assignment and pull in any upstream chan
 
 You can create and checkout a branch named "assignment-1" like this:
 ```
-git checkout -b assignment-1
+$ git checkout -b assignment-1
 ```
 
 ### Setup
