@@ -7,8 +7,10 @@
   },
   "configurePresets": [
     {
-      "name": "macos-base",
-      "displayName": "MacOS Base",
+      "name": "macos-arm-base",
+      "displayName": "MacOS ARM Base",
+      "description": "Don't use this one. Use MacOS ARM Debug/Release",
+      "hidden": true,
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/build-${presetName}",
       "cacheVariables": {
@@ -20,11 +22,21 @@
       }
     },
     {
-      "name": "macos-debug",
-      "displayName": "MacOS Debug",
-      "inherits": ["macos-base"],
+      "name": "macos-arm-debug",
+      "displayName": "MacOS ARM Debug",
+      "description": "MacOS debug build for Apple silicon",
+      "inherits": ["macos-arm-base"],
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "macos-arm-release",
+      "displayName": "MacOS ARM Release",
+      "description": "MacOS release build for Apple silicon",
+      "inherits": ["macos-arm-base"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
       }
     }
   ],
