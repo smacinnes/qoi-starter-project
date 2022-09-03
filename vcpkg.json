@@ -1,0 +1,24 @@
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+    "name": "qoi",
+    "version": "0.1.0",
+    "dependencies": [
+        "catch2",
+        {
+            "name": "sdl2",
+            "platform": "!windows",
+            "features": [
+                "vulkan",
+                "x11"
+            ]
+        },
+        {
+            "name": "sdl2",
+            "platform": "windows",
+            "features": [
+                "vulkan"
+            ]
+        },
+        "sdl2-image"
+    ]
+}
