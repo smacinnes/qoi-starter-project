@@ -133,14 +133,14 @@ Next, we'll install the latest stable version of Clang. The LLVM project provide
 $ cd /tmp
 $ wget https://apt.llvm.org/llvm.sh
 $ chmod +x llvm.sh
-$ sudo ./llvm.sh 14 all
+$ sudo ./llvm.sh 13 all
 ```
 
-Verify that clang-14 was installed:
+Verify that clang-13 was installed:
 
 ```
 $ clang-14 --version
-Ubuntu clang version 14.0.5-++20220610081652+4d5dad43b2eb-1~exp1~20220610081739.155
+Ubuntu clang version 13.0.x
 Target: x86_64-pc-linux-gnu
 Thread model: posix
 InstalledDir: /usr/bin
@@ -159,7 +159,7 @@ Run `> CMake: Select Kit` and select the version of Clang that you installed in 
 Use [Homebrew](https://brew.sh/) to install the dependencies.
 
 ```
-$ brew install cmake llvm
+$ brew install cmake ninja llvm@13
 ```
 
 Open the project with Visual Studio Code.
