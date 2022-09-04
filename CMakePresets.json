@@ -38,6 +38,39 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       }
+    },
+    {
+      "name": "linux-base",
+      "displayName": "Linux Base",
+      "description": "Don't use this one. Use Linux Debug/Release",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/install-${presetName}"
+      },
+      "environment": {
+        "CC": "/usr/bin/clang-13",
+        "CXX": "/usr/bin/clang++-13"
+      }
+    },
+    {
+      "name": "linux-debug",
+      "displayName": "Linux Debug",
+      "description": "Linux debug build",
+      "inherits": ["linux-base"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "linux-release",
+      "displayName": "Linux Release",
+      "description": "Linux release build",
+      "inherits": ["linux-base"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
     }
   ],
   "buildPresets": [
