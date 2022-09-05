@@ -13,33 +13,8 @@ This project is intended to be used as a starting point for writing a decoder fo
 
 ### Pre-Setup
 
-#### Option A: GitHub
-
-![Screenshot showing "Use this template" button in GitHub](img/qoi-template.png)
-
-If you are a GitHub user and want to host your source code there, you can get started quickly by clicking "Use this template" on the repository's [home page](https://github.com/eced4406/qoi-starter-project).
-This will prompt you to create a new private repository under your own account (similar to a fork).
-Complete the form and clone the repository (with the `--recurse-submodules` option - more on that later) to bring the source code down to your local machine.
-
-```
-$ git clone --recurse-submodules https://github.com/YOUR_GITHUB_USERNAME/YOUR_PROJECT_NAME.git 
-```
-
-Fill in the placeholders above appropriately.
-You can also use the SSH version of the URL if that's how you prefer to authenticate with GitHub.
-Check out the [relevant GitHub docs](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#authenticating-with-the-command-line) for more information.
-
-If you cloned the repository but forgot to add the `--recurse-submodules` option, you can run the following command to fetch them.
-```
-$ cd path/to/your/local/repo
-$ git submodule update --init
-```
-
-#### Option B: Git without the Hub
-
-If you want to get started with Git but don't want to use GitHub, you can pull the template repository into a local Git repository.
-
-The first step is to make a local Git repository:
+The first step is to get the template onto your local machine.
+You can start by making an empty local repository:
 ```
 $ mkdir -p /path/to/your/local/repo
 $ cd /path/to/your/local/repo
@@ -54,16 +29,41 @@ $ git pull upstream main
 
 Your local repository should now be populated with the contents of the template, and you should see commits from yours truly when you run `git log`.
 
-Fetch the git submodules with `git submodule update --init`.
+Now, fetch the git submodules (vcpkg):
+```
+$ git submodule update --init
+```
+
+At this point, you can push your repo up to a hosting service (like GitHub or GitLab) or just keep it local.
+For more info, see [here](https://docs.github.com/en/get-started/importing-your-projects-to-github/importing-source-code-to-github/adding-locally-hosted-code-to-github#adding-a-local-repository-to-github-using-git).
 
 #### Branches
 
-Regardless of which approach you took, you should create a branch for your work.
-This will make it easier to submit your assignment and pull in any upstream changes (e.g. if I need to fix something).
+This will make it easier to submit your assignment and pull in any upstream changes (see below).
 
-You can create and checkout a branch named "assignment-1" like this:
+You can create and checkout a branch named "assignment" like this:
 ```
-$ git checkout -b assignment-1
+$ git checkout -b assignment
+```
+
+#### Getting Updates
+
+Your instructor may need to fix some things in the template.
+If so, there will be new commits on the upstream repo that you'll need to merge into yours.
+If there are changes, you'll get a notification on Brightspace with instructions.
+They'll look something like this:
+
+First, pull the changes from the upstream.
+```
+$ git checkout main
+$ git pull upstream main
+$ git log # print the log to review the changes
+```
+
+Then, merge the changes into your working branch.
+```
+$ git checkout assignment # or whatever you called your working branch for the first assignment
+$ git merge main
 ```
 
 ### Setup
