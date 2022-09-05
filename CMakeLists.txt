@@ -7,7 +7,7 @@ set(CMAKE_TOOLCHAIN_FILE
 
 project(
   qoi
-  VERSION 1.0.0
+  VERSION 1.0.1
   LANGUAGES C CXX
 )
 
