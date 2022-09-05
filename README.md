@@ -204,7 +204,7 @@ From the Command Palette, run "CMake: Select kit". Select "Visual Studio 2022 - 
 
 ### Building
 
-
+From the Command Palette, run "CMake: Build"
 
 ## References
 
