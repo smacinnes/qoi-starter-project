@@ -40,6 +40,39 @@
       }
     },
     {
+      "name": "macos-intel-base",
+      "displayName": "MacOS Intel Base",
+      "description": "Don't use this one. Use MacOS Intel Debug/Release",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-${presetName}",
+      "cacheVariables": {
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/install-${presetName}"
+      },
+      "environment": {
+        "CC": "/usr/local/opt/llvm@13/bin/clang",
+        "CXX": "/usr/local/opt/llvm@13/bin/clang++"
+      }
+    },
+    {
+      "name": "macos-intel-debug",
+      "displayName": "MacOS Intel Debug",
+      "description": "MacOS debug build for Intel",
+      "inherits": ["macos-intel-base"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "macos-intel-release",
+      "displayName": "MacOS Intel Release",
+      "description": "MacOS release build for Intel",
+      "inherits": ["macos-intel-base"],
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
       "name": "linux-base",
       "displayName": "Linux Base",
       "description": "Don't use this one. Use Linux Debug/Release",
