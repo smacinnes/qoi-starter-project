@@ -2,13 +2,6 @@
 
 This project is intended to be used as a starting point for writing a decoder for the QOI image format.
 
-> ⚠️ While you should be able to build this project on all major platforms (Windows, MacOS, and common Linux distributions), it is recommended to do so in a UNIX-y environment.
-> In a subsequent lab, we're going to be building on the project, adding some tools that work best in Linux or MacOS.
-> 
-> If you are using a Windows device, I've found WSL2 works pretty well.
-> I have tested this project on an Ubuntu WSL2 instance from Windows 11.
-> Even the GUI image viewer works!
-
 ## Getting Started
 
 ### Pre-Setup
@@ -76,6 +69,11 @@ What you'll need:
 - CMake v3.23+
 - Clang v14+
 - Visual Studio Code
+
+Choose your own adventure:
+- [Linux](#linux-ubuntu-or-debian)
+- [MacOS](#macos)
+- [Windows](#windows)
 
 #### Linux (Ubuntu or Debian)
 
@@ -173,11 +171,6 @@ Select the Homebrew Clang kit (provided in `.vscode/cmake-kits.json`).
 
 #### Windows
 
-Before setting up this project on Windows, please see my note at the top of this README.
-If you decide to use WSL2 rather than using Windows natively, you can follow the Linux instructions from within your WSL2 environment.
-
-With that disclaimer out of the way, here's how you can get started on Windows natively.
-
 ##### 1. Install Visual Studio 2022
 
 You have two options here.
@@ -197,6 +190,11 @@ Download and install the "Windows x64 Installer" from the Latest Release section
 
 Open the project folder in VS Code and install the recommended extensions.
 You might need to restart VS Code after installing the extensions.
+
+Enable CMake kits by changing your your VS Code settings.
+Hit `Ctrl + ,` to open the VS Code settings.
+You can make this a global setting or just for the current folder switching between the "User" and "Workspace" tabs.
+Search for "CMake: Use CMake Presets" (cmake.useCMakePresets) and choose "never" in the dropdown.
 
 Open the Command Palette with `Ctrl + Shift + P` and run "CMake: Scan for kits".
 
