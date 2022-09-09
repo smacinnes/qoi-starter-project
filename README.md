@@ -88,6 +88,11 @@ $ sudo apt-get update
 $ sudo apt-get install \
     build-essential \
     curl \
+    gdb \
+    libx11-dev \
+    libxft-dev \
+    libxext-dev \
+    libsdl2-dev \
     ninja-build \
     pkg-config \
     tar \
