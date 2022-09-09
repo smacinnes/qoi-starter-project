@@ -67,7 +67,7 @@ Check the platform-specific instructions for tips on installing them.
 
 What you'll need:
 - CMake v3.23+
-- Clang v14+
+- Clang v13
 - Visual Studio Code
 
 Choose your own adventure:
@@ -130,7 +130,7 @@ Here are some links that may prove helpful if you decide to try this approach:
 
 ##### 2. Install Clang (and LLVM tools)
 
-Next, we'll install the latest stable version of Clang. The LLVM project provides [up-to-date packages for Debian and Ubuntu](https://apt.llvm.org/).
+Next, we'll install Clang 13. The LLVM project provides [up-to-date packages for Debian and Ubuntu](https://apt.llvm.org/).
 
 ```
 $ cd /tmp
@@ -142,7 +142,7 @@ $ sudo ./llvm.sh 13 all
 Verify that clang-13 was installed:
 
 ```
-$ clang-14 --version
+$ clang-13 --version
 Ubuntu clang version 13.0.x
 Target: x86_64-pc-linux-gnu
 Thread model: posix
