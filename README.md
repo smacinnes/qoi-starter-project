@@ -196,18 +196,42 @@ Download and install the "Windows x64 Installer" from the Latest Release section
 Open the project folder in VS Code and install the recommended extensions.
 You might need to restart VS Code after installing the extensions.
 
-Enable CMake kits by changing your your VS Code settings.
-Hit `Ctrl + ,` to open the VS Code settings.
-You can make this a global setting or just for the current folder switching between the "User" and "Workspace" tabs.
-Search for "CMake: Use CMake Presets" (cmake.useCMakePresets) and choose "never" in the dropdown.
+Open the Command Palette with `Ctrl + Shift + P` and run "CMake: Configure".
+It should prompt you to choose a preset; select the one for the version of Visual Studio you have installed (2019 or 2022).
 
-Open the Command Palette with `Ctrl + Shift + P` and run "CMake: Scan for kits".
-
-From the Command Palette, run "CMake: Select kit". Select "Visual Studio 2022 - x64".
+From the Command Palette, run "CMake: Build".
+Select the "Debug" build preset so you can step through the code.
 
 ### Building
 
 From the Command Palette, run "CMake: Build"
+
+
+### Running and Debugging
+
+The qoi_viewer application takes one command line argument: the path to the .qoi file to open.
+If you just run the application without specifying the path, all you'll see is a help message about how to run the program.
+
+When running from the command line, just add the path (absolute or relative to your current working directory) of a qio file to the end of your command:
+
+```
+$ cd build/out/bin # You might have to add Debug or Release to the end on Windows
+$ ./qoi_viewer /path/to/your/repo/data/dice.qoi # remember to substitute this path with the real one!
+```
+
+This is great for a quick test, but you probably want to set up VS Code to build and run the application without having to go to the command line.
+Open up the "Run and Debug" menu on the left hand sidebar.
+Click "create a launch.json file", and then click "Add Configuration".
+Pick the "C/C++: Launch" option (the exact text may different depending on your platform).
+Update the "program" field to point to `"${command:cmake.launchTargetPath}"`.
+Add the path to the QOI file you want to open to the "arguments" list.
+Save the file.
+From the Command Palette, run "CMake: Set Debug Target" and select "qoi_viewer".
+Now you can launch the viewer by typing F5, by hitting the green play button at the top of the "Run and Debug" sidebar tab, or by hitting the play or debug button in the bottom task bar.
+
+You can read more about debugging C/C++ projects with VS Code here:
+* https://code.visualstudio.com/docs/cpp/cpp-debug
+* https://vector-of-bool.github.io/docs/vscode-cmake-tools/debugging.html
 
 ## References
 
