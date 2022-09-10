@@ -13,7 +13,7 @@
 #define WINDOW_WIDTH 600
 
 void print_usage() {
-  puts("qoi_viewer FILE");
+  puts("usage: qoi_viewer FILE");
   puts("  FILE: path to QOI file to open");
 }
 
@@ -70,6 +70,7 @@ void *load_file(char const *filename, uint64_t *out_size) {
 
 int main(int argc, char *argv[]) {
   if (argc != 2) {
+    printf("error: 1 argument expected (%d provided)\n", argc - 1);
     print_usage();
     return EXIT_FAILURE;
   }
