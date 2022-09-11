@@ -24,19 +24,29 @@ typedef struct qoi_desc_t {
   uint8_t colorspace;  ///< image colorspace: see @ref colorspace
 } qoi_desc_t;
 
-/// File header
-typedef struct qoi_header {
-  char magic[4+1];      // magic bytes "qoif" with added null termination
-  uint32_t width;       // image width in pixels (BE)
-  uint32_t height;      // image height in pixels (BE)
-  uint8_t channels;     // 3 = RGB, 4 = RGBA
-  uint8_t colorspace;   // 0 = sRGB with linear alpha
-                        // 1 = all channels linear
-} qoi_header;
+/// File header (can remove this and just use image description)
+// typedef struct qoi_header {
+//   char magic[4+1];      // magic bytes "qoif" with added null termination
+//   uint32_t width;       // image width in pixels (BE)
+//   uint32_t height;      // image height in pixels (BE)
+//   uint8_t channels;     // 3 = RGB, 4 = RGBA
+//   uint8_t colorspace;   // 0 = sRGB with linear alpha
+//                         // 1 = all channels linear
+// } qoi_header;
+
+enum opcode{
+  QOI_OP_RGB,
+  QOI_OP_RGBA,
+  QOI_OP_INDEX,
+  QOI_OP_DIFF,
+  QOI_OP_LUMA,
+  QOI_OP_RUN
+};
+
 
 /// Decodes the provided buffer into raw pixels
 /// \returns A pointer to the decoded image. The caller is responsible for freeing this memory.
 /// \param data A pointer to the buffer of pixels to decode
 /// \param size The size of the input buffer, in bytes
 /// \param[out] out_desc The description of the decoded image
-void *qoi_decode(uint8_t const *data, uint64_t size, qoi_desc_t *out_desc);
+uint8_t *qoi_decode(uint8_t const *data, uint64_t size, qoi_desc_t *out_desc);

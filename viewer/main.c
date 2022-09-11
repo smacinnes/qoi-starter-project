@@ -94,6 +94,10 @@ int main(int argc, char *argv[]) {
   void *pixels = qoi_decode(data, size, &desc);
   free(data);
 
+  // testing that doesn't require showing image
+  // return EXIT_SUCCESS;
+  // --------------
+
   if (!pixels) {
     puts("failed to decode image");
   } else if (desc.width > (uint32_t)INT32_MAX || desc.height > (uint32_t)INT32_MAX) {
