@@ -10,17 +10,22 @@ extern "C" {
 #include <cstdint>
 #include <exception>
 #include <fstream>
+#include <iomanip>
 #include <memory>
 #include <optional>
+#include <sstream>
 #include <vector>
 
 namespace {
 
-char const *reference_filepath = "@QOI_BENCHMARK_REFERENCE_FILEPATH@";
-char const *test_filepath_0 = "@QOI_BENCHMARK_TEST_FILEPATH_0@";
-char const *test_filepath_1 = "@QOI_BENCHMARK_TEST_FILEPATH_1@";
-char const *test_filepath_2 = "@QOI_BENCHMARK_TEST_FILEPATH_2@";
-char const *test_filepath_3 = "@QOI_BENCHMARK_TEST_FILEPATH_3@";
+char const *REFERENCE_FILEPATH = "@QOI_BENCHMARK_REFERENCE_FILEPATH@";
+int const REFERENCE_WIDTH = 256;
+int const REFERENCE_HEIGHT = 256;
+
+char const *TEST_FILEPATH_0 = "@QOI_BENCHMARK_TEST_FILEPATH_0@";
+char const *TEST_FILEPATH_1 = "@QOI_BENCHMARK_TEST_FILEPATH_1@";
+char const *TEST_FILEPATH_2 = "@QOI_BENCHMARK_TEST_FILEPATH_2@";
+char const *TEST_FILEPATH_3 = "@QOI_BENCHMARK_TEST_FILEPATH_3@";
 
 std::vector<char> load_file(char const *filepath) {
   std::ifstream file(filepath, std::ios::binary | std::ios::ate);
@@ -36,41 +41,44 @@ std::vector<char> load_file(char const *filepath) {
   return buffer;
 }
 
-std::vector<char> decode_png(char const *filepath, int *w, int *h) {
-  auto surface =
-      std::unique_ptr<SDL_Surface, void (*)(SDL_Surface *)>(IMG_Load(filepath), SDL_FreeSurface);
-  if (!surface) {
-    throw std::runtime_error("failed to decode reference image");
-  }
+std::string to_string(std::uint8_t value) {
+  std::stringstream rss;
+  rss << value;
+  rss << " (0x" << std::setfill('0') << std::hex << std::setw(2)
+      << static_cast<std::uint32_t>(value) << ')';
 
-  if (surface->pitch != surface->w * 4) {
-    throw std::runtime_error("image decoded with unexpected pitch");
-  }
-
-  *w = surface->w;
-  *h = surface->h;
-
-  std::size_t buffer_size =
-      static_cast<std::size_t>(surface->pitch) * static_cast<std::size_t>(surface->h);
-  char const *buffer = static_cast<char const *>(surface->pixels);
-  return std::vector<char>(buffer, buffer + buffer_size);
+  return rss.str();
 }
 
 }  // namespace
 
 TEST_CASE("benchmark", "[qoi_decode]") {
-  int reference_w, reference_h;
-  auto reference_image = decode_png(reference_filepath, &reference_w, &reference_h);
+  auto reference_image = load_file(REFERENCE_FILEPATH);
 
-  auto test_filepath = GENERATE_COPY(test_filepath_0, test_filepath_1, test_filepath_2, test_filepath_3);
+  auto test_filepath =
+      GENERATE_COPY(TEST_FILEPATH_0, TEST_FILEPATH_1, TEST_FILEPATH_2, TEST_FILEPATH_3);
   auto test_image = load_file(test_filepath);
 
   qoi_desc_t desc = {0};
-  void *pixels = qoi_decode(test_image.data(), test_image.size(), &desc);
-  
-  REQUIRE(pixels != nullptr);
-  REQUIRE(desc.width == reference_w);
-  REQUIRE(desc.height == reference_h);
+  auto *pixels =
+      static_cast<std::uint8_t *>(qoi_decode(test_image.data(), test_image.size(), &desc));
 
-  REQUIRE(std::memcmp(pixels, reference_image.data(), reference_image.size()) == 0);
+  REQUIRE(pixels != nullptr);
+  REQUIRE(desc.width == REFERENCE_WIDTH);
+  REQUIRE(desc.height == REFERENCE_HEIGHT);
+
+  std::size_t match_count = 0;
+  for (std::size_t i = 0; i < reference_image.size(); ++i) {
+    auto const test_byte = pixels[i];
+    auto const ref_byte = static_cast<std::uint8_t>(reference_image[i]);
+
+    CAPTURE(i);
+    INFO("ref_byte := " << to_string(ref_byte));
+    INFO("test_bytes := " << to_string(test_byte));
+    CHECK(test_byte == ref_byte);
+
+    if (test_byte == ref_byte)
+      ++match_count;
+  }
+  REQUIRE(match_count == reference_image.size());
 }
