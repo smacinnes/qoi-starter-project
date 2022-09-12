@@ -233,6 +233,19 @@ You can read more about debugging C/C++ projects with VS Code here:
 * https://code.visualstudio.com/docs/cpp/cpp-debug
 * https://vector-of-bool.github.io/docs/vscode-cmake-tools/debugging.html
 
+### Benchmark
+
+Part of your evaluation for this assignment will be based on the results of the benchmark.
+The benchmark tests your decoder against four different variations of the "testcard_rgba" image.
+* `data/benchmark/0.qoi` is the simplest image. It uses only the `qoi_op_rgb` and `_rgba` types.
+* `data/benchmark/1.qoi` builds on `0.qoi` and makes use of the `qoi_op_run` type.
+* `data/benchmark/2.qoi` builds on `1.qoi` and uses the `qoi_op_index` type.
+* `data/benchmark/3.qoi` builds on `2.qoi` and uses the `qoi_op_diff` and `_luma` types.
+
+To run the benchmark, first make sure you've merged in the latest changes from `upstream` (see [Getting Updates](#getting-updates)).
+Then run "CMake: Delete cache and reconfigure".
+Then select and run the "qoi_benchmark" utility.
+
 ## References
 
 - QOI [specification](https://qoiformat.org/qoi-specification.pdf)
