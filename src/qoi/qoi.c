@@ -6,15 +6,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+// bit shift two bytes into one 16-bit number
 uint16_t bytes_to_uint16(uint8_t const *data) {
   return (uint16_t)data[1] | (uint16_t)data[0] << 8;
 }
 
+// bit shift four bytes into one 32-bit number
 uint32_t bytes_to_uint32(uint8_t const *data) {
   return (uint32_t)data[3] | (uint32_t)data[2] << 8 
     | (uint32_t)data[1] << 16 | (uint32_t)data[0] << 24;
 }
 
+// read the file header into the description struct
 void read_header(qoi_desc_t *out_desc, uint8_t const *data){
   out_desc->width = bytes_to_uint32(data+4);
   out_desc->height = bytes_to_uint32(data+8);
@@ -22,6 +25,7 @@ void read_header(qoi_desc_t *out_desc, uint8_t const *data){
   out_desc->colorspace = data[13];
 }
 
+// print the file header
 void print_header(qoi_desc_t *header) {
   printf("QOI File Header\n"
     "Width     : %i\n"
@@ -30,30 +34,18 @@ void print_header(qoi_desc_t *header) {
     "Colorspace: %i\n", header->width, header->height, header->channels, header->colorspace);
 }
 
+// check the first four bytes match "qoif"
 int is_valid_file_type(uint8_t const *data) {
   char magic[5];
   strncpy(magic, data, 4);
-  magic[4] = '\0';                                // null terminate for strcmp
+  magic[4] = '\0';          // null terminate for strcmp
   return (strcmp(magic, "qoif") == 0);
-  
-  // if (strcmp(magic, "qoif") != 0) {
-  //   printf("Invalid file type\n");
-  //   return -1;
-  // }
-  // return 0;
 }
 
+// identify the type of chunk by examining the first byte
 enum opcode get_opcode(uint8_t const *chunk) {
 
   uint8_t first_byte = chunk[0];
-  // uint8_t first_byte = 0b11111110;  // rgb
-  // uint8_t first_byte = 0b11111111;  // rgba
-  // uint8_t first_byte = 0b00111111;  // index
-  // uint8_t first_byte = 0b01111111;  // diff
-  // uint8_t first_byte = 0b10111111;  // luma
-  // uint8_t first_byte = 0b11011111;  // run
-  // printf("%i\n", first_byte);
-
   switch (first_byte) {
   case 0xFE:
     return QOI_OP_RGB;
@@ -81,54 +73,57 @@ enum opcode get_opcode(uint8_t const *chunk) {
   // add unrecognized opcode to enum?
 }
 
+// decode the RGB chunk
 void decode_RGB(uint8_t *next_read, uint8_t *next_write, uint8_t *prev_write) {
-  memcpy(next_write, next_read+1, 3);   // &x[1] vs x+1
-  next_write[3] = prev_write[3];  // copy prev alpha
+  memcpy(next_write, next_read+1, 3);  // skip opcode byte and copy next three (RGB values)
+  next_write[ALPHA] = prev_write[ALPHA];
 }
 
-void decode_RGBA(uint8_t *next_read, uint8_t *next_write, uint8_t *prev_write) {
-  memcpy(next_write, next_read+1, 4);
+// decode the RGBA chunk
+void decode_RGBA(uint8_t *next_read, uint8_t *next_write) {
+  memcpy(next_write, next_read+1, 4);  // skip opcode byte and copy next four (RGBA values)
 }
 
-void decode_INDEX(uint8_t *next_read, uint8_t *next_write, uint8_t *prev_write, uint8_t *prev_pixels) {
-  uint8_t index = (*next_read) & 0b00111111;
-  memcpy(next_write, &prev_pixels[index * 4]+1, 3);
-  next_write[3] = prev_write[3];  // copy prev alpha
+// decode the INDEX chunk
+void decode_INDEX(uint8_t *next_read, uint8_t *next_write, uint8_t *prev_pixels) {
+  uint8_t index = (*next_read) & INDEX_MASK;
+  memcpy(next_write, &prev_pixels[index * 4], 4);
 }
 
+// decode the DIFF chunk
 void decode_DIFF(uint8_t *next_read, uint8_t *next_write, uint8_t *prev_write) {
-  // static?
-  int8_t diff_red   = ((*next_read) & 0b00110000) - 2;
-  int8_t diff_green = ((*next_read) & 0b00001100) - 2;
-  int8_t diff_blue  = ((*next_read) & 0b00000011) - 2;
-  uint8_t red   = *(prev_write+0) + diff_red;
-  uint8_t green = *(prev_write+1) + diff_green;
-  uint8_t blue  = *(prev_write+2) + diff_blue;
-  next_write[0] = red;
-  next_write[1] = green;
-  next_write[2] = blue;
-  next_write[3] = prev_write[3];  // copy prev alpha
+  int8_t diff_red   = ((*next_read) & DIFF_R_MASK) - BIAS_DIFF;
+  int8_t diff_green = ((*next_read) & DIFF_G_MASK) - BIAS_DIFF;
+  int8_t diff_blue  = ((*next_read) & DIFF_B_MASK) - BIAS_DIFF;
+  uint8_t red   = prev_write[RED]   + diff_red;
+  uint8_t green = prev_write[GREEN] + diff_green;
+  uint8_t blue  = prev_write[BLUE]  + diff_blue;
+  next_write[RED]   = red;
+  next_write[GREEN] = green;
+  next_write[BLUE]  = blue;
+  next_write[ALPHA] = prev_write[ALPHA];
 }
 
+// decode the LUMA chunk
 void decode_LUMA(uint8_t *next_read, uint8_t *next_write, uint8_t *prev_write) {
-  int8_t diff_green = ((*next_read) & 0b00111111) - 32;
-  int8_t diff_red   = ((*next_read+1) & 0b11110000) + diff_green - 8;
-  int8_t diff_blue  = ((*next_read+1) & 0b00001111) + diff_green - 8;
-  uint8_t red   = *(prev_write+0) + diff_red;
-  uint8_t green = *(prev_write+1) + diff_green;
-  uint8_t blue  = *(prev_write+2) + diff_blue;
-  next_write[0] = red;
-  next_write[1] = green;
-  next_write[2] = blue;
-  next_write[3] = prev_write[3];  // copy prev alpha
+  int8_t diff_green = ((*next_read)   & LUMA_G_MASK) - BIAS_LUMA_G;
+  int8_t diff_red   = ((*next_read+1) & LUMA_R_MASK) + diff_green - BIAS_LUMA_RB;
+  int8_t diff_blue  = ((*next_read+1) & LUMA_B_MASK) + diff_green - BIAS_LUMA_RB;
+  uint8_t red   = prev_write[RED]   + diff_red;
+  uint8_t green = prev_write[GREEN] + diff_green;
+  uint8_t blue  = prev_write[BLUE]  + diff_blue;
+  next_write[RED]   = red;
+  next_write[GREEN] = green;
+  next_write[BLUE]  = blue;
+  next_write[ALPHA] = prev_write[ALPHA];
 }
 
+// decode the RUN chunk
 uint8_t decode_RUN(uint8_t *next_read, uint8_t *next_write, uint8_t *prev_write) {
-  uint8_t length = ((*next_read) & 0b00111111) + 1;
-  for (uint8_t i=0;i<length;i++) {  // better way?
+  uint8_t length = ((*next_read) & RUN_MASK) - BIAS_RUN;
+  for (uint8_t i=0;i<length;i++) {
     memcpy(next_write,prev_write,4); 
-    // fails at i=41, len=57, 0x91b532, chunks=46943
-    next_write += 4;  // pass by ref or return how many were advanced?
+    next_write += 4;
   }
   return length;
 }
@@ -186,33 +181,33 @@ uint8_t *qoi_decode(uint8_t const *data, uint64_t size, qoi_desc_t *out_desc) {
     switch (op) {
     case QOI_OP_RGB:
       decode_RGB(next_read, next_write, prev_write);
-      next_read += 4;
+      next_read += CHUNK_LEN_RGB;
       pixels++;
       break;
     case QOI_OP_RGBA:
-      decode_RGBA(next_read, next_write, prev_write);
-      next_read += 5;
+      decode_RGBA(next_read, next_write);
+      next_read += CHUNK_LEN_RGBA;
       pixels++;
       break;
     case QOI_OP_INDEX:
-      decode_INDEX(next_read, next_write, prev_write, prev_pixels);
-      next_read += 1;
+      decode_INDEX(next_read, next_write, prev_pixels);
+      next_read += CHUNK_LEN_INDEX;
       pixels++;
       break;
     case QOI_OP_DIFF:
       decode_DIFF(next_read, next_write, prev_write);
-      next_read += 1;
+      next_read += CHUNK_LEN_DIFF;
       pixels++;
       break;
     case QOI_OP_LUMA:
       decode_LUMA(next_read, next_write, prev_write);
-      next_read += 2;
+      next_read += CHUNK_LEN_LUMA;
       pixels++;
       break;
     case QOI_OP_RUN: {
       uint8_t length = decode_RUN(next_read, next_write, prev_write);
       next_write += (length-1) * 4;  // last increment is later 
-      next_read += 1;
+      next_read += CHUNK_LEN_RUN;
       pixels+=length;
       break;
     }

@@ -13,14 +13,38 @@
 #define QOI_COLORSPACE_LINEAR 1  ///< all channels linear
 /// @}
 
+// qoi file header size in bytes
 #define HEADER_SIZE 14
 
-#define CHUNK_LEN_RGB 4
-#define CHUNK_LEN_RGBA 5
+// byte indexes into a pixel
+#define RED   0
+#define GREEN 1
+#define BLUE  2
+#define ALPHA 3
+
+// lengths of chunk sizes in qoi format
+#define CHUNK_LEN_RGB   4
+#define CHUNK_LEN_RGBA  5
 #define CHUNK_LEN_INDEX 1
-#define CHUNK_LEN_DIFF 1
-#define CHUNK_LEN_LUMA 2
-#define CHUNK_LEN_RUN 1
+#define CHUNK_LEN_DIFF  1
+#define CHUNK_LEN_LUMA  2
+#define CHUNK_LEN_RUN   1
+
+// biases used to encode signed offsets as unsigned bytes
+#define BIAS_DIFF    2
+#define BIAS_LUMA_G 32
+#define BIAS_LUMA_RB 8
+#define BIAS_RUN    -1
+
+// bit masks to extract info from chunks
+#define INDEX_MASK  0b00111111
+#define DIFF_R_MASK 0b00110000
+#define DIFF_G_MASK 0b00001100
+#define DIFF_B_MASK 0b00000011
+#define LUMA_R_MASK 0b11110000
+#define LUMA_G_MASK 0b00111111
+#define LUMA_B_MASK 0b00001111
+#define RUN_MASK    0b00111111
 
 /// Image description
 typedef struct qoi_desc_t {
@@ -38,7 +62,6 @@ enum opcode{
   QOI_OP_LUMA,
   QOI_OP_RUN
 };
-
 
 /// Decodes the provided buffer into raw pixels
 /// \returns A pointer to the decoded image. The caller is responsible for freeing this memory.
