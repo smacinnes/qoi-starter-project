@@ -128,6 +128,14 @@ uint8_t decode_RUN(uint8_t *next_read, uint8_t *next_write, uint8_t *prev_write)
   return length;
 }
 
+// add pixel to hash map
+void hash_pixel(uint8_t *pixel, uint8_t *prev_pixels) {
+  uint16_t index = (((uint16_t)pixel[RED])   * 3
+                 +  ((uint16_t)pixel[GREEN]) * 5
+                 +  ((uint16_t)pixel[BLUE])  * 7
+                 +  ((uint16_t)pixel[ALPHA]) * 11) % 64;
+  memcpy(&prev_pixels[index*4], pixel, 4);
+}
 
 uint8_t *qoi_decode(uint8_t const *data, uint64_t size, qoi_desc_t *out_desc) {
 
@@ -135,8 +143,9 @@ uint8_t *qoi_decode(uint8_t const *data, uint64_t size, qoi_desc_t *out_desc) {
   TODO:
   build and run debug with one key press
   fix warnings about const
-  add more defines for biases and indexes
   basic error warnings?
+  figure out streaks - hash/index issue?
+  not getting results from all test images - from same problem?
   */
 
   if (!is_valid_file_type(data)) {
@@ -150,7 +159,7 @@ uint8_t *qoi_decode(uint8_t const *data, uint64_t size, qoi_desc_t *out_desc) {
   uint8_t prev_pixels[64 * 4] = {0};  // 64 previous pixels with hash map
 
   uint8_t *decoded_data = calloc((size_t)(out_desc->width * out_desc->height * 4), 1);
-  decoded_data[3] = 255; // set initial alpha to 255? will this work?
+  decoded_data[ALPHA] = 255; // set initial alpha to 255?
 
   uint8_t *next_read = &data[HEADER_SIZE];  // header in dice.qoi is followed by 0x00?
 
@@ -163,6 +172,7 @@ uint8_t *qoi_decode(uint8_t const *data, uint64_t size, qoi_desc_t *out_desc) {
   
   printf("data: %u\n", data);
   printf("size: %u\n", size);
+  
   while (next_read < (data+size-8)){
   // for (int i=0;i<5;i++){
     
@@ -206,17 +216,14 @@ uint8_t *qoi_decode(uint8_t const *data, uint64_t size, qoi_desc_t *out_desc) {
       break;
     case QOI_OP_RUN: {
       uint8_t length = decode_RUN(next_read, next_write, prev_write);
-      next_write += (length-1) * 4;  // last increment is later 
+      next_write += (length-1) * 4;  // last increment happens later 
       next_read += CHUNK_LEN_RUN;
       pixels+=length;
       break;
     }
     }
 
-    // add last pixel to hash map
-    uint8_t index_position = (*(next_write) * 3 + *(next_write+1) * 5 + *(next_write+2) * 7 + *(next_write+3) * 11) % 64;
-    memcpy(&prev_pixels[index_position*4], next_write, 4);
-
+    hash_pixel(next_write, prev_pixels);
 
     // advance pointers
     prev_write = next_write;
