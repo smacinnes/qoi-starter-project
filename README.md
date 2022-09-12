@@ -41,7 +41,7 @@ $ git checkout -b assignment
 
 #### Getting Updates
 
-Your instructor may need to fix some things in the template.
+Your instructor may need to fix or add some things in the template.
 If so, there will be new commits on the upstream repo that you'll need to merge into yours.
 If there are changes, you'll get a notification on Brightspace with instructions.
 They'll look something like this:
@@ -52,6 +52,8 @@ $ git checkout main
 $ git pull upstream main
 $ git log # print the log to review the changes
 ```
+
+Remember, you can run `git status` to check the state of your repository, including what branch you're currently on.
 
 Then, merge the changes into your working branch.
 ```
@@ -205,7 +207,6 @@ Select the "Debug" build preset so you can step through the code.
 ### Building
 
 From the Command Palette, run "CMake: Build"
-
 
 ### Running and Debugging
 
