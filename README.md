@@ -154,9 +154,8 @@ InstalledDir: /usr/bin
 Install the C/C++ Extension pack for VS Code (it should be recommended to you when you open the project for the first time).
 You may need to restart/reload VS Code for this to take effect.
 
-Run `> CMake: Scan for Kits` so that VS Code finds the version of Clang that you installed in step 2.
+Select the Linux Debug/Release CMake preset depending on what you want to build (I'd recommend starting with Debug).
 
-Run `> CMake: Select Kit` and select the version of Clang that you installed in step 2.
 #### MacOS
 
 Use [Homebrew](https://brew.sh/) to install the dependencies.
@@ -172,7 +171,8 @@ $ cd /path/to/qoi
 $ code .
 ```
 
-Select the Homebrew Clang kit (provided in `.vscode/cmake-kits.json`).
+Select the MacOS ARM/Intel Debug/Release CMake configure preset depending on your system and what you want to build (I'd recommend starting on Debug).
+These presets can be found in `CMakePresets.json` if you're curious.
 
 #### Windows
 
