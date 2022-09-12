@@ -61,7 +61,7 @@ TEST_CASE("benchmark", "[qoi_decode]") {
 
   qoi_desc_t desc = {0};
   auto *pixels =
-      static_cast<std::uint8_t *>(qoi_decode(test_image.data(), test_image.size(), &desc));
+      static_cast<std::uint8_t const *>(qoi_decode(test_image.data(), test_image.size(), &desc));
 
   REQUIRE(pixels != nullptr);
   REQUIRE(desc.width == REFERENCE_WIDTH);
@@ -80,5 +80,7 @@ TEST_CASE("benchmark", "[qoi_decode]") {
     if (test_byte == ref_byte)
       ++match_count;
   }
+
+  CAPTURE(test_filepath);
   REQUIRE(match_count == reference_image.size());
 }
