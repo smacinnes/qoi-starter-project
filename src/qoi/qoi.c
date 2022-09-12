@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 // bit shift two bytes into one 16-bit number
 uint16_t bytes_to_uint16(uint8_t const *data) {
@@ -70,7 +71,7 @@ enum opcode get_opcode(uint8_t const *chunk) {
   }
     break;
   }
-  // add unrecognized opcode to enum?
+  // todo: add unrecognized opcode to enum
 }
 
 // decode the RGB chunk
@@ -92,29 +93,23 @@ void decode_INDEX(uint8_t *next_read, uint8_t *next_write, uint8_t *prev_pixels)
 
 // decode the DIFF chunk
 void decode_DIFF(uint8_t *next_read, uint8_t *next_write, uint8_t *prev_write) {
-  int8_t diff_red   = ((*next_read) & DIFF_R_MASK) - BIAS_DIFF;
-  int8_t diff_green = ((*next_read) & DIFF_G_MASK) - BIAS_DIFF;
+  int8_t diff_red   = (((*next_read) & DIFF_R_MASK) >> 4) - BIAS_DIFF;
+  int8_t diff_green = (((*next_read) & DIFF_G_MASK) >> 2) - BIAS_DIFF;
   int8_t diff_blue  = ((*next_read) & DIFF_B_MASK) - BIAS_DIFF;
-  uint8_t red   = prev_write[RED]   + diff_red;
-  uint8_t green = prev_write[GREEN] + diff_green;
-  uint8_t blue  = prev_write[BLUE]  + diff_blue;
-  next_write[RED]   = red;
-  next_write[GREEN] = green;
-  next_write[BLUE]  = blue;
+  next_write[RED]   = prev_write[RED]   + diff_red;
+  next_write[GREEN] = prev_write[GREEN] + diff_green;
+  next_write[BLUE]  = prev_write[BLUE]  + diff_blue;
   next_write[ALPHA] = prev_write[ALPHA];
 }
 
 // decode the LUMA chunk
 void decode_LUMA(uint8_t *next_read, uint8_t *next_write, uint8_t *prev_write) {
   int8_t diff_green = ((*next_read)   & LUMA_G_MASK) - BIAS_LUMA_G;
-  int8_t diff_red   = ((*next_read+1) & LUMA_R_MASK) + diff_green - BIAS_LUMA_RB;
-  int8_t diff_blue  = ((*next_read+1) & LUMA_B_MASK) + diff_green - BIAS_LUMA_RB;
-  uint8_t red   = prev_write[RED]   + diff_red;
-  uint8_t green = prev_write[GREEN] + diff_green;
-  uint8_t blue  = prev_write[BLUE]  + diff_blue;
-  next_write[RED]   = red;
-  next_write[GREEN] = green;
-  next_write[BLUE]  = blue;
+  int8_t diff_red   = ((*(next_read+1) & LUMA_R_MASK) >> 4) + diff_green - BIAS_LUMA_RB;
+  int8_t diff_blue  = (*(next_read+1) & LUMA_B_MASK) + diff_green - BIAS_LUMA_RB;
+  next_write[RED]   = prev_write[RED]   + diff_red;
+  next_write[GREEN] = prev_write[GREEN] + diff_green;
+  next_write[BLUE]  = prev_write[BLUE]  + diff_blue;
   next_write[ALPHA] = prev_write[ALPHA];
 }
 
@@ -130,10 +125,7 @@ uint8_t decode_RUN(uint8_t *next_read, uint8_t *next_write, uint8_t *prev_write)
 
 // add pixel to hash map
 void hash_pixel(uint8_t *pixel, uint8_t *prev_pixels) {
-  uint16_t index = (((uint16_t)pixel[RED])   * 3
-                 +  ((uint16_t)pixel[GREEN]) * 5
-                 +  ((uint16_t)pixel[BLUE])  * 7
-                 +  ((uint16_t)pixel[ALPHA]) * 11) % 64;
+  uint8_t index = (pixel[RED] * 3 + pixel[GREEN] * 5 + pixel[BLUE] * 7 + pixel[ALPHA] * 11) % 64;
   memcpy(&prev_pixels[index*4], pixel, 4);
 }
 
@@ -144,8 +136,8 @@ uint8_t *qoi_decode(uint8_t const *data, uint64_t size, qoi_desc_t *out_desc) {
   build and run debug with one key press
   fix warnings about const
   basic error warnings?
-  figure out streaks - hash/index issue?
-  not getting results from all test images - from same problem?
+  less magic numbers
+  formatting
   */
 
   if (!is_valid_file_type(data)) {
@@ -159,80 +151,69 @@ uint8_t *qoi_decode(uint8_t const *data, uint64_t size, qoi_desc_t *out_desc) {
   uint8_t prev_pixels[64 * 4] = {0};  // 64 previous pixels with hash map
 
   uint8_t *decoded_data = calloc((size_t)(out_desc->width * out_desc->height * 4), 1);
-  decoded_data[ALPHA] = 255; // set initial alpha to 255?
+  decoded_data[ALPHA] = 255; // set initial alpha to 255
 
-  uint8_t *next_read = &data[HEADER_SIZE];  // header in dice.qoi is followed by 0x00?
+  uint8_t *next_read = &data[HEADER_SIZE];  // make this const?
 
   uint8_t *next_write = decoded_data;   // points to start of next pixel
   uint8_t *prev_write = decoded_data;   // points to start of prev pixel
 
-
   unsigned chunks = 0;
   unsigned pixels = 0;
   
-  printf("data: %u\n", data);
-  printf("size: %u\n", size);
+  printf("Encoded data: %u bytes\n", size);
   
-  while (next_read < (data+size-8)){
-  // for (int i=0;i<5;i++){
-    
-    // printf("-----------\n");
-    // printf("chunk     : %u\n", chunks);
-    // printf("next_read : %u\n", next_read);
-    // printf("next_write: %u\n", next_write);
-    // printf("prev_write: %u\n", prev_write);
+  while (next_read < (data+size-8)){  // todo: detect end condition
 
-
-    // printf("%i\n", *next_byte);
     enum opcode op = get_opcode(next_read);
-
-    // printf("opcode: %i\n", op);
 
     switch (op) {
     case QOI_OP_RGB:
       decode_RGB(next_read, next_write, prev_write);
       next_read += CHUNK_LEN_RGB;
-      pixels++;
       break;
     case QOI_OP_RGBA:
       decode_RGBA(next_read, next_write);
       next_read += CHUNK_LEN_RGBA;
-      pixels++;
       break;
     case QOI_OP_INDEX:
       decode_INDEX(next_read, next_write, prev_pixels);
+      if (next_write[ALPHA] == 0) {
+        int x = 0;
+      }
       next_read += CHUNK_LEN_INDEX;
-      pixels++;
       break;
     case QOI_OP_DIFF:
       decode_DIFF(next_read, next_write, prev_write);
       next_read += CHUNK_LEN_DIFF;
-      pixels++;
       break;
     case QOI_OP_LUMA:
       decode_LUMA(next_read, next_write, prev_write);
       next_read += CHUNK_LEN_LUMA;
-      pixels++;
       break;
     case QOI_OP_RUN: {
       uint8_t length = decode_RUN(next_read, next_write, prev_write);
-      next_write += (length-1) * 4;  // last increment happens later 
       next_read += CHUNK_LEN_RUN;
-      pixels+=length;
+      next_write += (length-1) * 4;  // last increment happens later 
+      pixels += (length-1);
       break;
     }
     }
 
+    // adds pixel to hash map
     hash_pixel(next_write, prev_pixels);
 
     // advance pointers
     prev_write = next_write;
     next_write += 4;
 
+    // track progress
     chunks++;
-
+    pixels++;
   }
-  printf("Decoded %u chunks\n", chunks);
-  printf("Decoded %u pixels\n", pixels);
+  printf("Decoded data:\n"
+         "Bytes : %u\n"
+         "Chunks: %u\n"
+         "Pixels: %u\n", (out_desc->width * out_desc->height * 4), chunks, pixels);
   return decoded_data;
 }
