@@ -2,13 +2,6 @@
 
 This project is intended to be used as a starting point for writing a decoder for the QOI image format.
 
-> ⚠️ While you should be able to build this project on all major platforms (Windows, MacOS, and common Linux distributions), it is recommended to do so in a UNIX-y environment.
-> In a subsequent lab, we're going to be building on the project, adding some tools that work best in Linux or MacOS.
-> 
-> If you are using a Windows device, I've found WSL2 works pretty well.
-> I have tested this project on an Ubuntu WSL2 instance from Windows 11.
-> Even the GUI image viewer works!
-
 ## Getting Started
 
 ### Pre-Setup
@@ -48,7 +41,7 @@ $ git checkout -b assignment
 
 #### Getting Updates
 
-Your instructor may need to fix some things in the template.
+Your instructor may need to fix or add some things in the template.
 If so, there will be new commits on the upstream repo that you'll need to merge into yours.
 If there are changes, you'll get a notification on Brightspace with instructions.
 They'll look something like this:
@@ -59,6 +52,8 @@ $ git checkout main
 $ git pull upstream main
 $ git log # print the log to review the changes
 ```
+
+Remember, you can run `git status` to check the state of your repository, including what branch you're currently on.
 
 Then, merge the changes into your working branch.
 ```
@@ -74,8 +69,13 @@ Check the platform-specific instructions for tips on installing them.
 
 What you'll need:
 - CMake v3.23+
-- Clang v14+
+- Clang v13
 - Visual Studio Code
+
+Choose your own adventure:
+- [Linux](#linux-ubuntu-or-debian)
+- [MacOS](#macos)
+- [Windows](#windows)
 
 #### Linux (Ubuntu or Debian)
 
@@ -90,6 +90,11 @@ $ sudo apt-get update
 $ sudo apt-get install \
     build-essential \
     curl \
+    gdb \
+    libx11-dev \
+    libxft-dev \
+    libxext-dev \
+    libsdl2-dev \
     ninja-build \
     pkg-config \
     tar \
@@ -127,7 +132,7 @@ Here are some links that may prove helpful if you decide to try this approach:
 
 ##### 2. Install Clang (and LLVM tools)
 
-Next, we'll install the latest stable version of Clang. The LLVM project provides [up-to-date packages for Debian and Ubuntu](https://apt.llvm.org/).
+Next, we'll install Clang 13. The LLVM project provides [up-to-date packages for Debian and Ubuntu](https://apt.llvm.org/).
 
 ```
 $ cd /tmp
@@ -139,7 +144,7 @@ $ sudo ./llvm.sh 13 all
 Verify that clang-13 was installed:
 
 ```
-$ clang-14 --version
+$ clang-13 --version
 Ubuntu clang version 13.0.x
 Target: x86_64-pc-linux-gnu
 Thread model: posix
@@ -151,9 +156,8 @@ InstalledDir: /usr/bin
 Install the C/C++ Extension pack for VS Code (it should be recommended to you when you open the project for the first time).
 You may need to restart/reload VS Code for this to take effect.
 
-Run `> CMake: Scan for Kits` so that VS Code finds the version of Clang that you installed in step 2.
+Select the Linux Debug/Release CMake preset depending on what you want to build (I'd recommend starting with Debug).
 
-Run `> CMake: Select Kit` and select the version of Clang that you installed in step 2.
 #### MacOS
 
 Use [Homebrew](https://brew.sh/) to install the dependencies.
@@ -169,14 +173,10 @@ $ cd /path/to/qoi
 $ code .
 ```
 
-Select the Homebrew Clang kit (provided in `.vscode/cmake-kits.json`).
+Select the MacOS ARM/Intel Debug/Release CMake configure preset depending on your system and what you want to build (I'd recommend starting on Debug).
+These presets can be found in `CMakePresets.json` if you're curious.
 
 #### Windows
-
-Before setting up this project on Windows, please see my note at the top of this README.
-If you decide to use WSL2 rather than using Windows natively, you can follow the Linux instructions from within your WSL2 environment.
-
-With that disclaimer out of the way, here's how you can get started on Windows natively.
 
 ##### 1. Install Visual Studio 2022
 
@@ -198,13 +198,54 @@ Download and install the "Windows x64 Installer" from the Latest Release section
 Open the project folder in VS Code and install the recommended extensions.
 You might need to restart VS Code after installing the extensions.
 
-Open the Command Palette with `Ctrl + Shift + P` and run "CMake: Scan for kits".
+Open the Command Palette with `Ctrl + Shift + P` and run "CMake: Configure".
+It should prompt you to choose a preset; select the one for the version of Visual Studio you have installed (2019 or 2022).
 
-From the Command Palette, run "CMake: Select kit". Select "Visual Studio 2022 - x64".
+From the Command Palette, run "CMake: Build".
+Select the "Debug" build preset so you can step through the code.
 
 ### Building
 
 From the Command Palette, run "CMake: Build"
+
+### Running and Debugging
+
+The qoi_viewer application takes one command line argument: the path to the .qoi file to open.
+If you just run the application without specifying the path, all you'll see is a help message about how to run the program.
+
+When running from the command line, just add the path (absolute or relative to your current working directory) of a qio file to the end of your command:
+
+```
+$ cd build/out/bin # You might have to add Debug or Release to the end on Windows
+$ ./qoi_viewer /path/to/your/repo/data/dice.qoi # remember to substitute this path with the real one!
+```
+
+This is great for a quick test, but you probably want to set up VS Code to build and run the application without having to go to the command line.
+* Open up the "Run and Debug" menu on the left hand sidebar.
+* Click "create a launch.json file", and then click "Add Configuration".
+* Pick the "C/C++: Launch" option (the exact text may different depending on your platform).
+* Update the "program" field to point to `"${command:cmake.launchTargetPath}"`.
+* Add the path to the QOI file you want to open to the "arguments" list.
+* Save the file.
+* From the Command Palette, run "CMake: Set Debug Target" and select "qoi_viewer".
+Now you can launch the viewer by typing F5 or by hitting the green play button at the top of the "Run and Debug" sidebar tab.
+
+You can read more about debugging C/C++ projects with VS Code here:
+* https://code.visualstudio.com/docs/cpp/cpp-debug
+* https://vector-of-bool.github.io/docs/vscode-cmake-tools/debugging.html
+
+### Benchmark
+
+Part of your evaluation for this assignment will be based on the results of the benchmark.
+The benchmark tests your decoder against four different variations of the "testcard_rgba" image.
+* `data/benchmark/0.qoi` is the simplest image. It uses only the `qoi_op_rgb` and `_rgba` types.
+* `data/benchmark/1.qoi` builds on `0.qoi` and makes use of the `qoi_op_run` type.
+* `data/benchmark/2.qoi` builds on `1.qoi` and uses the `qoi_op_index` type.
+* `data/benchmark/3.qoi` builds on `2.qoi` and uses the `qoi_op_diff` and `_luma` types.
+
+To run the benchmark, first make sure you've merged in the latest changes from `upstream` (see [Getting Updates](#getting-updates)).
+Then run "CMake: Delete cache and reconfigure".
+Then select and run the "qoi_benchmark" utility.
 
 ## References
 

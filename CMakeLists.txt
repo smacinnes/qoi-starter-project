@@ -17,6 +17,7 @@ include(cmake/StandardProjectSettings.cmake)
 # Add an interface library add target properties
 add_library(qoi_options INTERFACE)
 target_compile_features(qoi_options INTERFACE c_std_11)
+target_compile_features(qoi_options INTERFACE cxx_std_17)
 
 # Add another interface library for managing warnings
 add_library(qoi_warnings INTERFACE)
@@ -30,6 +31,7 @@ option(BUILD_TESTS "Build and configure units tests with Catch2" ON)
 option(BUILD_IMAGE_VIEWER
        "Build basic image viewer to visually inspect decoded images" ON
 )
+option(BUILD_BENCHMARK "Build benchmark test" ON)
 
 # Only support fuzzing with Clang
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -68,4 +70,8 @@ endif()
 
 if(BUILD_IMAGE_VIEWER)
   add_subdirectory(viewer)
+endif()
+
+if(BUILD_BENCHMARK)
+  add_subdirectory(benchmark)
 endif()
