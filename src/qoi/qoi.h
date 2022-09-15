@@ -13,8 +13,10 @@
 #define QOI_COLORSPACE_LINEAR 1  ///< all channels linear
 /// @}
 
-// qoi file header size in bytes
-#define HEADER_SIZE 14
+
+#define HEADER_SIZE    14
+#define FOOTER_SIZE     8
+#define BYTES_PER_PIXEL 4
 
 // byte indexes into a pixel
 #define RED   0
@@ -30,12 +32,6 @@
 #define CHUNK_LEN_LUMA  2
 #define CHUNK_LEN_RUN   1
 
-// biases used to encode signed offsets as unsigned bytes
-#define BIAS_DIFF    2
-#define BIAS_LUMA_G 32
-#define BIAS_LUMA_RB 8
-#define BIAS_RUN    -1
-
 // bit masks to extract info from chunks
 #define INDEX_MASK  0b00111111
 #define DIFF_R_MASK 0b00110000
@@ -45,6 +41,25 @@
 #define LUMA_G_MASK 0b00111111
 #define LUMA_B_MASK 0b00001111
 #define RUN_MASK    0b00111111
+
+// shift sizes after masks
+#define DIFF_R_SHIFT 4
+#define DIFF_G_SHIFT 2
+#define DIFF_B_SHIFT 0
+#define LUMA_R_SHIFT 4
+
+// biases used to encode signed offsets as unsigned bytes
+#define DIFF_BIAS    2
+#define LUMA_G_BIAS 32
+#define LUMA_RB_BIAS 8
+#define RUN_BIAS    -1
+
+// hash function parameters
+#define HASH_SIZE 64
+#define HASH_R 3
+#define HASH_G 5
+#define HASH_B 7
+#define HASH_A 11
 
 /// Image description
 typedef struct qoi_desc_t {
@@ -68,4 +83,4 @@ enum opcode{
 /// \param data A pointer to the buffer of pixels to decode
 /// \param size The size of the input buffer, in bytes
 /// \param[out] out_desc The description of the decoded image
-uint8_t *qoi_decode(uint8_t const *data, uint64_t size, qoi_desc_t *out_desc);
+void *qoi_decode(void const *data, uint64_t size, qoi_desc_t *out_desc);
