@@ -7,6 +7,15 @@
 #include <string.h>
 #include <assert.h>
 
+/*
+TODO:
+build and run debug with one key press
+fix warnings about const
+add more basic error warnings?
+formatting
+multiple files?
+*/
+
 // bit shift two bytes into one 16-bit number (BE)
 uint16_t bytes_to_uint16(uint8_t const *data) {
   return (uint16_t)data[1] | (uint16_t)data[0] << 8;
@@ -129,15 +138,6 @@ void hash_pixel(uint8_t *pixel, uint8_t *prev_pixels) {
 
 void *qoi_decode(void const *data, uint64_t size, qoi_desc_t *out_desc) {
 
-  /*
-  TODO:
-  build and run debug with one key press
-  fix warnings about const
-  basic error warnings?
-  formatting
-  multiple files?
-  */
-
   if (!is_valid_file_type(data)) {
     printf("Invalid file type\n");
     return NULL;
@@ -146,18 +146,18 @@ void *qoi_decode(void const *data, uint64_t size, qoi_desc_t *out_desc) {
   read_header(out_desc, data);
   print_header(out_desc);
 
-  uint8_t prev_pixels[HASH_SIZE * BYTES_PER_PIXEL] = {0};  // 64 previous pixels with hash map
+  uint8_t prev_pixels[HASH_SIZE * BYTES_PER_PIXEL] = {0};  // hash map of prev pixels
 
   uint8_t *decoded_data = calloc((size_t)(out_desc->width * out_desc->height), BYTES_PER_PIXEL);
   decoded_data[ALPHA] = 255; // set initial alpha to fully opaque
 
-  uint8_t const *next_read = &data[HEADER_SIZE];  // next_read is const?
+  uint8_t const *next_read = &data[HEADER_SIZE];
 
   uint8_t *next_write = decoded_data;   // points to start of next pixel
   uint8_t *prev_write = decoded_data;   // points to start of prev pixel
 
-  unsigned chunks = 0;
-  unsigned pixels = 0;
+  unsigned chunks = 0;  // number of chunks read
+  unsigned pixels = 0;  // number of pixels decoded
   
   printf("Encoded data: %u bytes\n", size);
   
