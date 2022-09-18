@@ -143,7 +143,7 @@ void *qoi_decode(void const *data, uint64_t size, qoi_desc_t *out_desc) {
   }
 
   read_header(out_desc, data);
-  print_header(out_desc);
+  // print_header(out_desc);
 
   uint8_t prev_pixels[HASH_SIZE * BYTES_PER_PIXEL] = {0};  // hash map of prev pixels
 
@@ -158,7 +158,7 @@ void *qoi_decode(void const *data, uint64_t size, qoi_desc_t *out_desc) {
   unsigned chunks = 0;  // number of chunks read
   unsigned pixels = 0;  // number of pixels decoded
   
-  printf("Encoded data: %u bytes\n", size);
+  // printf("Encoded data: %u bytes\n", size);
   
   while (next_read < (data+size-FOOTER_SIZE)){  // todo: detect end condition
 
@@ -205,9 +205,9 @@ void *qoi_decode(void const *data, uint64_t size, qoi_desc_t *out_desc) {
     chunks++;
     pixels++;
   }
-  printf("Decoded data:\n"
-         "Bytes : %u\n"
-         "Chunks: %u\n"
-         "Pixels: %u\n", (out_desc->width * out_desc->height * 4), chunks, pixels);
+  // printf("Decoded data:\n"
+  //        "Bytes : %u\n"
+  //        "Chunks: %u\n"
+  //        "Pixels: %u\n", (out_desc->width * out_desc->height * 4), chunks, pixels);
   return decoded_data;
 }
