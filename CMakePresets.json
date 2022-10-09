@@ -106,13 +106,21 @@
       }
     },
     {
-      "name": "linux-debug-static",
-      "displayName": "Linux Debug - Static",
+      "name": "linux-debug-static-analysis",
+      "displayName": "Linux Debug - Static Analysis",
       "inherits": ["linux-debug"],
       "cacheVariables": {
           "ENABLE_WARNINGS": true,
           "ENABLE_CPPCHECK": true,
           "ENABLE_CLANG_TIDY": true
+      }
+    },
+    {
+      "name": "linux-debug-dynamic-analysis",
+      "displayName": "Linux Debug - Dynamic Analysis",
+      "inherits": ["linux-debug-debug-static-analysis"],
+      "cacheVariables": {
+        "BUILD_FUZZ_TESTS": true
       }
     },
     {
