@@ -106,21 +106,23 @@
       }
     },
     {
+      "name": "linux-debug-fuzzing",
+      "displayName": "Linux Debug - Fuzzing",
+      "description": "Linux debug build with fuzz testing",
+      "inherits": ["linux-debug"],
+      "cacheVariables": {
+        "BUILD_FUZZ_TESTS": true
+      }
+    },
+    {
       "name": "linux-debug-static-analysis",
       "displayName": "Linux Debug - Static Analysis",
-      "inherits": ["linux-debug"],
+      "description": "Linux debug build with fuzzing and static analysis",
+      "inherits": ["linux-debug-fuzzing"],
       "cacheVariables": {
           "ENABLE_WARNINGS": true,
           "ENABLE_CPPCHECK": true,
           "ENABLE_CLANG_TIDY": true
-      }
-    },
-    {
-      "name": "linux-debug-dynamic-analysis",
-      "displayName": "Linux Debug - Dynamic Analysis",
-      "inherits": ["linux-debug-static-analysis"],
-      "cacheVariables": {
-        "BUILD_FUZZ_TESTS": true
       }
     },
     {
