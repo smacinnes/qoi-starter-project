@@ -7,7 +7,7 @@ set(CMAKE_TOOLCHAIN_FILE
 
 project(
   qoi
-  VERSION 1.0.1
+  VERSION 1.1.0
   LANGUAGES C CXX
 )
 
@@ -35,6 +35,7 @@ option(BUILD_BENCHMARK "Build benchmark test" ON)
 option(ENABLE_WARNINGS "Enable compiler warnings" ON)
 option(ENABLE_WARNINGS_AS_ERRORS "Elevate compiler warnings to errors" OFF)
 option(ENABLE_CPPCHECK "Enable cppcheck static analysis" ON)
+option(ENABLE_CLANG_TIDY "Enable ClangTidy static analysis" ON)
 
 # Enable addition warnings if requested
 if(ENABLE_WARNINGS)
@@ -63,6 +64,7 @@ message(STATUS "Benchmark: ${BUILD_BENCHMARK}")
 message(STATUS "Warnings: ${ENABLE_WARNINGS}")
 message(STATUS "Warnings as errors: ${ENABLE_WARNINGS_AS_ERRORS}")
 message(STATUS "CppCheck: ${ENABLE_CPPCHECK}")
+message(STATUS "ClangTidy: ${ENABLE_CLANG_TIDY}")
 
 # Enable address and undefined behaviour sanitizers when fuzzing
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND BUILD_FUZZ_TESTS)
@@ -91,8 +93,4 @@ endif()
 
 if(BUILD_BENCHMARK)
   add_subdirectory(benchmark)
-endif()
-
-if(BUILD_FUZZ_TESTS)
-  add_subdirectory(fuzz_test)
 endif()

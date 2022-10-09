@@ -118,7 +118,7 @@
     {
       "name": "linux-debug-dynamic-analysis",
       "displayName": "Linux Debug - Dynamic Analysis",
-      "inherits": ["linux-debug-debug-static-analysis"],
+      "inherits": ["linux-debug-static-analysis"],
       "cacheVariables": {
         "BUILD_FUZZ_TESTS": true
       }
