@@ -66,12 +66,8 @@ message(STATUS "CppCheck: ${ENABLE_CPPCHECK}")
 
 # Enable address and undefined behaviour sanitizers when fuzzing
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND BUILD_FUZZ_TESTS)
-  target_compile_options(
-    qoi_options INTERFACE -fsanitize=address,undefined --coverage -O0 -g
-  )
-  target_link_options(
-    qoi_options INTERFACE -fsanitize=address,undefined --coverage
-  )
+  target_compile_options(qoi_options INTERFACE -fsanitize=address,undefined --coverage -O0 -g)
+  target_link_options(qoi_options INTERFACE -fsanitize=address,undefined --coverage)
 endif()
 
 add_subdirectory(src)
@@ -95,4 +91,8 @@ endif()
 
 if(BUILD_BENCHMARK)
   add_subdirectory(benchmark)
+endif()
+
+if(BUILD_FUZZ_TESTS)
+  add_subdirectory(fuzz_test)
 endif()
