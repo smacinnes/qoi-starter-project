@@ -92,7 +92,9 @@ int main(int argc, char *argv[]) {
   printf("image channels:    %10" PRIu32 "\n", desc.channels);
   printf("image colourspace: %10" PRIu32 "\n", desc.colorspace);
 
-  printf("last byte:         0x%08x\n", ((uint8_t const *)pixels)[desc.width * desc.height * 4]);
+  printf("first pixel:       0x%08x\n", ((uint32_t const *)pixels)[0]);
+  printf("middle pixel:      0x%08x\n", ((uint32_t const *)pixels)[desc.width * desc.height / 2]);
+  printf("last pixel:        0x%08x\n", ((uint32_t const *)pixels)[desc.width * desc.height]);
 
   free(pixels);
 }
