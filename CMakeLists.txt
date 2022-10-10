@@ -31,6 +31,7 @@ option(BUILD_TESTS "Build and configure units tests with Catch2" ON)
 option(BUILD_IMAGE_VIEWER
        "Build basic image viewer to visually inspect decoded images" ON
 )
+option(BUILD_INFO_TOOL "Build image info tool" ON)
 option(BUILD_BENCHMARK "Build benchmark test" ON)
 option(ENABLE_WARNINGS "Enable compiler warnings" ON)
 option(ENABLE_WARNINGS_AS_ERRORS "Elevate compiler warnings to errors" OFF)
@@ -59,6 +60,7 @@ endif()
 message(STATUS "Doxygen generation: ${BUILD_DOCS}")
 message(STATUS "Unit tests: ${BUILD_TESTS}")
 message(STATUS "Viewer: ${BUILD_IMAGE_VIEWER}")
+message(STATUS "Info tool: ${BUILD_INFO_TOOL}")
 message(STATUS "Fuzz tests: ${BUILD_FUZZ_TESTS}")
 message(STATUS "Benchmark: ${BUILD_BENCHMARK}")
 message(STATUS "Warnings: ${ENABLE_WARNINGS}")
@@ -68,8 +70,12 @@ message(STATUS "ClangTidy: ${ENABLE_CLANG_TIDY}")
 
 # Enable address and undefined behaviour sanitizers when fuzzing
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND BUILD_FUZZ_TESTS)
-  target_compile_options(qoi_options INTERFACE -fsanitize=address,undefined --coverage -O0 -g)
-  target_link_options(qoi_options INTERFACE -fsanitize=address,undefined --coverage)
+  target_compile_options(
+    qoi_options INTERFACE -fsanitize=address,undefined --coverage -O0 -g
+  )
+  target_link_options(
+    qoi_options INTERFACE -fsanitize=address,undefined --coverage
+  )
 endif()
 
 add_subdirectory(src)
@@ -89,6 +95,10 @@ endif()
 
 if(BUILD_IMAGE_VIEWER)
   add_subdirectory(viewer)
+endif()
+
+if(BUILD_INFO_TOOL)
+  add_subdirectory(info)
 endif()
 
 if(BUILD_BENCHMARK)
