@@ -7,12 +7,15 @@ set(CMAKE_TOOLCHAIN_FILE
 
 project(
   qoi
-  VERSION 1.0.1
+  VERSION 1.1.0
   LANGUAGES C CXX
 )
 
 # Configure global settings
 include(cmake/StandardProjectSettings.cmake)
+
+include(cmake/CompilerWarnings.cmake)
+include(cmake/StaticAnalyzers.cmake)
 
 # Add an interface library add target properties
 add_library(qoi_options INTERFACE)
@@ -22,16 +25,32 @@ target_compile_features(qoi_options INTERFACE cxx_std_17)
 # Add another interface library for managing warnings
 add_library(qoi_warnings INTERFACE)
 
-include(cmake/CompilerWarnings.cmake)
-set_project_warnings(qoi_warnings)
-
 # Define some options to configure the build
 option(BUILD_DOCS "Generate API docs with Doxygen" ON)
 option(BUILD_TESTS "Build and configure units tests with Catch2" ON)
 option(BUILD_IMAGE_VIEWER
        "Build basic image viewer to visually inspect decoded images" ON
 )
+option(BUILD_INFO_TOOL "Build image info tool" ON)
 option(BUILD_BENCHMARK "Build benchmark test" ON)
+option(ENABLE_WARNINGS "Enable compiler warnings" ON)
+option(ENABLE_WARNINGS_AS_ERRORS "Elevate compiler warnings to errors" OFF)
+option(ENABLE_CPPCHECK "Enable cppcheck static analysis" ON)
+option(ENABLE_CLANG_TIDY "Enable ClangTidy static analysis" ON)
+
+# Enable addition warnings if requested
+if(ENABLE_WARNINGS)
+  include(cmake/CompilerWarnings.cmake)
+  set_project_warnings(qoi_warnings ${ENABLE_WARNINGS_AS_ERRORS})
+endif()
+
+if(ENABLE_CPPCHECK)
+  enable_cppcheck("")
+endif()
+
+if(ENABLE_CLANG_TIDY)
+  enable_clang_tidy()
+endif()
 
 # Only support fuzzing with Clang
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -41,7 +60,13 @@ endif()
 message(STATUS "Doxygen generation: ${BUILD_DOCS}")
 message(STATUS "Unit tests: ${BUILD_TESTS}")
 message(STATUS "Viewer: ${BUILD_IMAGE_VIEWER}")
+message(STATUS "Info tool: ${BUILD_INFO_TOOL}")
 message(STATUS "Fuzz tests: ${BUILD_FUZZ_TESTS}")
+message(STATUS "Benchmark: ${BUILD_BENCHMARK}")
+message(STATUS "Warnings: ${ENABLE_WARNINGS}")
+message(STATUS "Warnings as errors: ${ENABLE_WARNINGS_AS_ERRORS}")
+message(STATUS "CppCheck: ${ENABLE_CPPCHECK}")
+message(STATUS "ClangTidy: ${ENABLE_CLANG_TIDY}")
 
 # Enable address and undefined behaviour sanitizers when fuzzing
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND BUILD_FUZZ_TESTS)
@@ -70,6 +95,10 @@ endif()
 
 if(BUILD_IMAGE_VIEWER)
   add_subdirectory(viewer)
+endif()
+
+if(BUILD_INFO_TOOL)
+  add_subdirectory(info)
 endif()
 
 if(BUILD_BENCHMARK)

@@ -106,6 +106,26 @@
       }
     },
     {
+      "name": "linux-debug-fuzzing",
+      "displayName": "Linux Debug - Fuzzing",
+      "description": "Linux debug build with fuzz testing",
+      "inherits": ["linux-debug"],
+      "cacheVariables": {
+        "BUILD_FUZZ_TESTS": true
+      }
+    },
+    {
+      "name": "linux-debug-static-analysis",
+      "displayName": "Linux Debug - Static Analysis",
+      "description": "Linux debug build with fuzzing and static analysis",
+      "inherits": ["linux-debug-fuzzing"],
+      "cacheVariables": {
+          "ENABLE_WARNINGS": true,
+          "ENABLE_CPPCHECK": true,
+          "ENABLE_CLANG_TIDY": true
+      }
+    },
+    {
       "name": "vs2019",
       "displayName": "Visual Studio 2019",
       "description": "Using compilers for Visual Studio 16 2019 (x64 architecture)",
